@@ -3,7 +3,8 @@
 #include <string.h>
 #include <ctype.h>
 
-#define MAX_LEN 50
+#define MAX_PALABRAS 100
+#define MAX_LEN      50
 
 /* Estructura que representa una entrada en el índice.
    Guarda el rango [inicio, fin] del arreglo donde
@@ -14,7 +15,7 @@ typedef struct {
     int  fin;
 } EntradaIndice;
 
-/* Función que construye el índice recorriendo el arreglo UNA sola vez.
+/* Construye el índice recorriendo el arreglo UNA sola vez.
    Asume que las palabras ya están ordenadas alfabéticamente. */
 int construir_indice(char palabras[][MAX_LEN], int n, EntradaIndice indice[], int *tam_indice)
 {
@@ -56,6 +57,9 @@ EntradaIndice *buscar_en_indice(EntradaIndice indice[], int tam, char letra)
     return NULL;
 }
 
+0 -> a, 0, 9 -> 2 3456ert
+1 -> b, 10, 12 -> 3
+
 /* Búsqueda indexada completa.
    1. Consulta el índice con la inicial de la clave.
    2. Recorre SOLO el sub-rango correspondiente. */
@@ -68,14 +72,13 @@ int busqueda_indexada(char palabras[][MAX_LEN], int n, EntradaIndice indice[], i
         return -1;
     }
 
-    printf("  Indice: letra='%c', rango [%d..%d]\n", entrada->letra, entrada->inicio, entrada->fin);
-
-
+    printf("  Índice: letra='%c', rango [%d..%d]\n",
+           entrada->letra, entrada->inicio, entrada->fin);
 
     /* Búsqueda lineal solo dentro del rango */
     for (int i = entrada->inicio; i <= entrada->fin; i++) {
         if (strcmp(palabras[i], clave) == 0) {
-            printf("  Encontrado en posicion %d\n", i);
+            printf("  Encontrado en posición %d\n", i);
             return i;
         }
     }
@@ -84,12 +87,11 @@ int busqueda_indexada(char palabras[][MAX_LEN], int n, EntradaIndice indice[], i
     return -1;
 }
 
-
-int main(int argc, char const *argv[])
+int main(void)
 {
-    
+    /* Arreglo ordenado alfabéticamente */
     char palabras[][MAX_LEN] = {
-        "abeja", "aguila",
+        "abeja", "águila",
         "ballena", "búho",
         "caballo", "ciervo",
         "delfín",
@@ -102,29 +104,18 @@ int main(int argc, char const *argv[])
     int tam_indice = 0;
     construir_indice(palabras, n, indice, &tam_indice);
 
-    printf("=== Indice construido ===\n");
+    printf("=== Índice construido ===\n");
     for (int i = 0; i < tam_indice; i++) {
         printf("  '%c' -> posiciones [%d..%d]\n",
                indice[i].letra, indice[i].inicio, indice[i].fin);
     }
 
-    printf("\n=== Busquedas ===\n");
-
-    // 1. Declaras un buffer para guardar lo que escriba el usuario
-    char clave[MAX_LEN];
-
-    // 2. Pides la clave
-    printf("Que clave deseas buscar?: ");
-
-    // 3. Lees la cadena con fgets (más seguro que scanf para strings)
-    fgets(clave, MAX_LEN, stdin);
-
-    // 4. fgets incluye el '\n' al final, hay que quitarlo
-    clave[strcspn(clave, "\n")] = '\0';
-
-    // 5. Buscas directamente con esa clave
-    printf("\nBuscando: '%s'\n", clave);
-    busqueda_indexada(palabras, n, indice, tam_indice, clave);
+    printf("\n=== Búsquedas ===\n");
+    const char *claves[] = {"búho", "ciervo", "zorro"};
+    for (int i = 0; i < 3; i++) {
+        printf("\nBuscando: '%s'\n", claves[i]);
+        busqueda_indexada(palabras, n, indice, tam_indice, claves[i]);
+    }
 
     return 0;
 }
