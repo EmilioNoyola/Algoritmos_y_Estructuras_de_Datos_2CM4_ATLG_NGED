@@ -8,12 +8,14 @@
 #define MAX_PALABRAS 300000
 #define REPETICIONES 1000   
 
+/*  */
 typedef struct {
     char letra;
     int  inicio;
     int  fin;
 } LetraInicial;
 
+/* */
 int construir_indice(char **palabras, int n, LetraInicial indice[], int *tam_indice)
 {
     *tam_indice = 0;
@@ -41,6 +43,7 @@ int construir_indice(char **palabras, int n, LetraInicial indice[], int *tam_ind
     return 1;
 }
 
+/* */
 LetraInicial *buscar_en_indice(LetraInicial indice[], int tam, char letra)
 {
     letra = tolower(letra);
@@ -82,6 +85,7 @@ int busqueda_binaria(char **palabras, int n, const char *clave)
 
 int busqueda_indexada_secuencial(char **palabras, LetraInicial indice[], int tam_indice, const char *clave)
 {
+    //
     LetraInicial *entrada = buscar_en_indice(indice, tam_indice, clave[0]);
     if (!entrada) return -1;
 
@@ -95,6 +99,7 @@ int busqueda_indexada_secuencial(char **palabras, LetraInicial indice[], int tam
 
 int busqueda_indexada_binaria(char **palabras, LetraInicial indice[], int tam_indice, const char *clave)
 {
+    // 
     LetraInicial *entrada = buscar_en_indice(indice, tam_indice, clave[0]);
     if (!entrada) return -1;
 
@@ -114,6 +119,7 @@ int busqueda_indexada_binaria(char **palabras, LetraInicial indice[], int tam_in
     return -1;
 }
 
+/* */
 double medir_tiempo_secuencial(char **palabras, int n, const char *clave)
 {
     clock_t ini = clock();
