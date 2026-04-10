@@ -8,14 +8,19 @@
 #define MAX_PALABRAS 300000
 #define REPETICIONES 1000   
 
-/*  */
+/*  Crea una estructura con la letra inicial,
+    que define el inicio y el fin del rango de ese bloque considerando la primera letra
+*/
 typedef struct {
     char letra;
     int  inicio;
     int  fin;
 } LetraInicial;
 
-/* */
+
+/*  Construye un indice para asignar el tamaño de cada bloque de letra inicial, 
+    el tamaño del indice es una variable global 
+*/
 int construir_indice(char **palabras, int n, LetraInicial indice[], int *tam_indice)
 {
     *tam_indice = 0;
@@ -43,7 +48,9 @@ int construir_indice(char **palabras, int n, LetraInicial indice[], int *tam_ind
     return 1;
 }
 
-/* */
+/*  Una funcion de tipo letra inicial para guardar la direccion de los tres parametros: 
+    letra, inicio y fin, recorriendo cada bloque dentro del indice   
+*/
 LetraInicial *buscar_en_indice(LetraInicial indice[], int tam, char letra)
 {
     letra = tolower(letra);
@@ -85,7 +92,10 @@ int busqueda_binaria(char **palabras, int n, const char *clave)
 
 int busqueda_indexada_secuencial(char **palabras, LetraInicial indice[], int tam_indice, const char *clave)
 {
-    //
+    /*  Busca dentro del indice en que bloque va a ser la busqueda secuencial,
+        con ayuda de la variable entrada,
+        y asi no recorrer todo el arreglo usando la busqueda indexada
+    */
     LetraInicial *entrada = buscar_en_indice(indice, tam_indice, clave[0]);
     if (!entrada) return -1;
 
@@ -99,7 +109,10 @@ int busqueda_indexada_secuencial(char **palabras, LetraInicial indice[], int tam
 
 int busqueda_indexada_binaria(char **palabras, LetraInicial indice[], int tam_indice, const char *clave)
 {
-    // 
+    /*  Busca dentro del indice en que bloque va a ser la busqueda binaria,
+        con ayuda de la variable entrada,
+        y asi no recorrer todo el arreglo usando la busqueda indexada
+    */ 
     LetraInicial *entrada = buscar_en_indice(indice, tam_indice, clave[0]);
     if (!entrada) return -1;
 
@@ -119,7 +132,10 @@ int busqueda_indexada_binaria(char **palabras, LetraInicial indice[], int tam_in
     return -1;
 }
 
-/* */
+    /*  La funcion clock() de la librería time.h empieza a contar el tiempo desde antes de realizar las repeticiones,
+        una vez hechas todas las busquedas termina de contar el tiempo y devuelve el promedio de todas las repeticiones,
+        CLOCKS_PER_SEC nos da la unidad de tiempo por segundo y esos segundos los convertimos en milisegundos al multiplicar por 1e6
+    */
 double medir_tiempo_secuencial(char **palabras, int n, const char *clave)
 {
     clock_t ini = clock();
