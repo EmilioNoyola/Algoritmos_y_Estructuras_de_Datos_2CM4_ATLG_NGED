@@ -4,6 +4,7 @@
 #include <ctype.h>
 
 #define MAX_LEN 50
+#define MAX_PALABRAS 300002
 
 /* Estructura que representa una entrada en el índice.
    Guarda el rango [inicio, fin] del arreglo donde
@@ -56,9 +57,6 @@ EntradaIndice *buscar_en_indice(EntradaIndice indice[], int tam, char letra)
     return NULL;
 }
 
-/* Búsqueda indexada completa.
-   1. Consulta el índice con la inicial de la clave.
-   2. Recorre SOLO el sub-rango correspondiente. */
 int busqueda_indexada(char palabras[][MAX_LEN], int n, EntradaIndice indice[], int tam_indice, const char *clave)
 {
     EntradaIndice *entrada = buscar_en_indice(indice, tam_indice, clave[0]);
@@ -69,8 +67,6 @@ int busqueda_indexada(char palabras[][MAX_LEN], int n, EntradaIndice indice[], i
     }
 
     printf("  Indice: letra='%c', rango [%d..%d]\n", entrada->letra, entrada->inicio, entrada->fin);
-
-
 
     /* Búsqueda lineal solo dentro del rango */
     for (int i = entrada->inicio; i <= entrada->fin; i++) {
@@ -84,18 +80,32 @@ int busqueda_indexada(char palabras[][MAX_LEN], int n, EntradaIndice indice[], i
     return -1;
 }
 
+char palabras[MAX_PALABRAS][MAX_LEN];
 
-int main(int argc, char const *argv[])
+int main(void)
 {
-    
-    char palabras[][MAX_LEN] = {
-        "abeja", "aguila",
-        "ballena", "búho",
-        "caballo", "ciervo",
-        "delfín",
-        "elefante"
-    };
-    int n = 8;
+
+    int n = 0;                            
+
+    FILE *archivo = fopen("SALIDA.txt", "r");
+
+    if (archivo == NULL) {
+        printf("Error: no se pudo abrir el archivo\n");
+        return 1;
+    }
+
+    while (n < MAX_PALABRAS && fgets(palabras[n], MAX_LEN, archivo) != NULL) {
+        // Quitar el '\n' que deja fgets al final de cada línea
+        palabras[n][strcspn(palabras[n], "\n")] = '\0';
+        
+        // Solo contar la línea si no está vacía
+        if (strlen(palabras[n]) > 0)
+            n++;
+    }
+
+    fclose(archivo);
+
+    printf("Se leyeron %d palabras del archivo\n", n);
 
     /* Construir el índice */
     EntradaIndice indice[26];
@@ -110,19 +120,13 @@ int main(int argc, char const *argv[])
 
     printf("\n=== Busquedas ===\n");
 
-    // 1. Declaras un buffer para guardar lo que escriba el usuario
     char clave[MAX_LEN];
 
-    // 2. Pides la clave
     printf("Que clave deseas buscar?: ");
-
-    // 3. Lees la cadena con fgets (más seguro que scanf para strings)
     fgets(clave, MAX_LEN, stdin);
 
-    // 4. fgets incluye el '\n' al final, hay que quitarlo
     clave[strcspn(clave, "\n")] = '\0';
 
-    // 5. Buscas directamente con esa clave
     printf("\nBuscando: '%s'\n", clave);
     busqueda_indexada(palabras, n, indice, tam_indice, clave);
 
