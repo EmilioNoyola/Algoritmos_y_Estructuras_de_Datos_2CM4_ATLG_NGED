@@ -64,17 +64,17 @@ int busqueda_secuencial(char **palabras, int n, const char *clave)
 
 int busqueda_binaria(char **palabras, int n, const char *clave)
 {
-    int izq = 0, der = n - 1;
+    int bajo = 0, alto = n - 1;
 
-    while (izq <= der) {
-        int mid = izq + (der - izq) / 2;
-        int cmp = strcmp(palabras[mid], clave);
-        if (cmp == 0) {
-           return mid; 
-        } else if (cmp < 0) {
-            izq = mid + 1;
+    while (bajo <= alto) {
+        int central = bajo + (alto - bajo) / 2;
+        int ValorCentral = strcmp(palabras[central], clave);
+        if (ValorCentral == 0) {
+           return central; 
+        } else if (ValorCentral < 0) {
+            bajo = central + 1;
         } else {
-            der = mid - 1;
+            alto = central - 1;
         }
     }
     return -1;
@@ -98,17 +98,17 @@ int busqueda_indexada_binaria(char **palabras, LetraInicial indice[], int tam_in
     LetraInicial *entrada = buscar_en_indice(indice, tam_indice, clave[0]);
     if (!entrada) return -1;
 
-    int izq = entrada->inicio, der = entrada->fin;
+    int bajo = entrada->inicio, alto = entrada->fin;
 
-    while (izq <= der) {
-        int mid = izq + (der - izq) / 2;
-        int cmp = strcmp(palabras[mid], clave);
-        if (cmp == 0) {
-            return mid;  
-        } else if (cmp < 0) {
-            izq = mid + 1; 
+    while (bajo <= alto) {
+        int central = bajo + (alto - bajo) / 2;
+        int ValorCentral = strcmp(palabras[central], clave);
+        if (ValorCentral == 0) {
+            return central;  
+        } else if (ValorCentral < 0) {
+            bajo = central + 1; 
         } else {
-            der = mid - 1; 
+            alto = central - 1; 
         }
     }
     return -1;
