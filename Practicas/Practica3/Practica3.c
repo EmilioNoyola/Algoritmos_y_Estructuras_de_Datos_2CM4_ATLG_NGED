@@ -72,7 +72,7 @@ int busqueda_binaria(char palabras[][MAX_LEN], int n, const char *clave)
     return -1;
 }
 
-int busqueda_indexada_secuencial(char palabras[][MAX_LEN], int n, EntradaIndice indice[], int tam_indice, const char *clave)
+int busqueda_indexada_secuencial(char palabras[][MAX_LEN], EntradaIndice indice[], int tam_indice, const char *clave)
 {
     EntradaIndice *e = buscar_en_indice(indice, tam_indice, clave[0]);
     if (!e) return -1;
@@ -83,7 +83,7 @@ int busqueda_indexada_secuencial(char palabras[][MAX_LEN], int n, EntradaIndice 
 }
 
 // Utilizar variables incluidas en clase.
-int busqueda_indexada_binaria(char palabras[][MAX_LEN], int n, EntradaIndice indice[], int tam_indice, const char *clave)
+int busqueda_indexada_binaria(char palabras[][MAX_LEN], EntradaIndice indice[], int tam_indice, const char *clave)
 {
     EntradaIndice *e = buscar_en_indice(indice, tam_indice, clave[0]);
     if (!e) return -1;
@@ -120,7 +120,7 @@ double medir_indexada_sec(char palabras[][MAX_LEN], int n, EntradaIndice indice[
 {
     clock_t ini = clock();
     for (int r = 0; r < REPETICIONES; r++)
-        busqueda_indexada_secuencial(palabras, n, indice, tam_indice, clave);
+        busqueda_indexada_secuencial(palabras, indice, tam_indice, clave);
     clock_t fin = clock();
     return ((double)(fin - ini) / CLOCKS_PER_SEC * 1e6) / REPETICIONES;
 }
@@ -129,7 +129,7 @@ double medir_indexada_bin(char palabras[][MAX_LEN], int n, EntradaIndice indice[
 {
     clock_t ini = clock();
     for (int r = 0; r < REPETICIONES; r++)
-        busqueda_indexada_binaria(palabras, n, indice, tam_indice, clave);
+        busqueda_indexada_binaria(palabras, indice, tam_indice, clave);
     clock_t fin = clock();
     return ((double)(fin - ini) / CLOCKS_PER_SEC * 1e6) / REPETICIONES;
 }
@@ -217,7 +217,7 @@ int main(void)
 
         case 3:
             t   = medir_indexada_sec(palabras, n, indice, tam_indice, clave);
-            pos = busqueda_indexada_secuencial(palabras, n, indice, tam_indice, clave);
+            pos = busqueda_indexada_secuencial(palabras, indice, tam_indice, clave);
             printf("--- Indexada + secuencial ---\n");
             printf("  Resultado: %s\n", pos >= 0 ? "encontrado" : "no encontrado");
             if (pos >= 0) printf("  Posicion : %d\n", pos);
@@ -226,7 +226,7 @@ int main(void)
 
         case 4:
             t   = medir_indexada_bin(palabras, n, indice, tam_indice, clave);
-            pos = busqueda_indexada_binaria(palabras, n, indice, tam_indice, clave);
+            pos = busqueda_indexada_binaria(palabras, indice, tam_indice, clave);
             printf("--- Indexada + binaria ---\n");
             printf("  Resultado: %s\n", pos >= 0 ? "encontrado" : "no encontrado");
             if (pos >= 0) printf("  Posicion : %d\n", pos);
