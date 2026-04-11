@@ -1,3 +1,10 @@
+/*
+    Práctica 3: Búsqueda Indexada
+    Alumnos: 
+     - Álvarez Tahuilán Luis Gustavo
+     - Noyola Gómez Emilio Damian
+    Fecha: 13 de abril de 2026
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,7 +13,7 @@
 
 #define MAX_LEN      50
 #define MAX_PALABRAS 300000
-#define REPETICIONES 1000   
+#define REPETICIONES 1000  
 
 /*  Crea una estructura con la letra inicial,
     que define el inicio y el fin del rango de ese bloque considerando la primera letra
@@ -222,8 +229,9 @@ int main(void)
     int leidas = 0;
     while (leidas < n && fgets(palabras[leidas], MAX_LEN, archivo) != NULL) {
         palabras[leidas][strcspn(palabras[leidas], "\n")] = '\0';
-        if (strlen(palabras[leidas]) > 0)
+        if (strlen(palabras[leidas]) > 0) {
             leidas++;
+        }
     }
     fclose(archivo);
     printf("Se leyeron %d palabras del archivo\n", n);
@@ -333,8 +341,9 @@ int main(void)
             break;
     }
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++) {
         free(palabras[i]);
+    }   
     free(palabras);
 
     free(indice);
