@@ -1,3 +1,10 @@
+/*
+    Práctica 4: Exploración Exhaustiva
+    Alumnos: 
+     - Álvarez Tahuilán Luis Gustavo
+     - Noyola Gómez Emilio Damian
+    Fecha: 20 de abril de 2026
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -88,7 +95,6 @@ int main()
         } else invalidas++;
     }
 
-    /* Impresión en consola */
     int ancho_max = 2;
     for (int i = 0; i < total; i++)
     {
@@ -103,10 +109,9 @@ int main()
     }
 
     int ancho_id  = snprintf(NULL, 0, "%d", total - 1);
-     int ancho_bin = n > 7 ? n : 7;
+    int ancho_bin = n > 7 ? n : 7;
     int linea     = ancho_id + ancho_bin + ancho_max + 42;
 
-    /* Impresión en consola */
     printf("\n%-*s | %-*s | %-*s | %-5s | %-5s | %-6s | %s\n",
         ancho_id,  "#",
         ancho_bin, "Binario",
@@ -114,7 +119,6 @@ int main()
         "Peso", "Valor", "Valida", "Optima");
     for (int i = 0; i < linea; i++) printf("-");
 
-    /* Impresión en consola */
     for (int i = 0; i < total; i++)
     {
         char bin[64];
