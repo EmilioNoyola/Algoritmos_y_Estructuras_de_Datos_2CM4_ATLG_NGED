@@ -89,7 +89,6 @@ int buscar_entrada_salida(int *ef, int *ec, int *sf, int *sc)
     return encontrados;
 }
 
-/* Imprime el laberinto con colores según el estado de cada celda */
 void imprimir_laberinto(int entrada_f, int entrada_c, int salida_f,  int salida_c)
 {
     for (int i = 0; i < filas; i++) {
