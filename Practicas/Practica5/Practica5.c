@@ -1,3 +1,10 @@
+/*
+    Práctica 5: Programación por vuelta atrás (Backtracking)
+    Alumnos: 
+     - Álvarez Tahuilán Luis Gustavo
+     - Noyola Gómez Emilio Damian
+    Fecha: 27 de abril de 2026
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
