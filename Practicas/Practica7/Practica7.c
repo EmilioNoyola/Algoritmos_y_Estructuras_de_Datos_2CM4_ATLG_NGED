@@ -1,11 +1,14 @@
+/*
+    Práctica 7: Listas dinámicas
+    Alumnos: 
+     - Álvarez Tahuilán Luis Gustavo
+     - Noyola Gómez Emilio Damian
+    Fecha: 18 de mayo de 2026
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
-
-// =============================================
-// COLORES ANSI
-// =============================================
 
 #define RESET   "\033[0m"
 #define BOLD    "\033[1m"
@@ -17,19 +20,11 @@
 #define CYAN    "\033[36m"
 #define WHITE   "\033[37m"
 
-// =============================================
-// ESTRUCTURA DEL NODO
-// =============================================
-
 typedef struct Nodo
 {
     int valor;
     struct Nodo* sig;
 } Nodo;
-
-// =============================================
-// UTILIDADES DE INTERFAZ
-// =============================================
 
 void limpiarPantalla() {
 #ifdef _WIN32
@@ -85,30 +80,22 @@ void mostrarAdvertencia(const char *msg) {
     printf("\n  %s%s⚠  %s%s\n", BOLD, YELLOW, msg, RESET);
 }
 
-// =============================================
-// FUNCIONES BASE
-// =============================================
-
-// Agrega un nodo al FINAL de la lista
+// Agrega un nodo al final de la lista
 void agregar(Nodo **p, int v)
 {
-    // Creamos el nuevo nodo
     Nodo *nuevo = (Nodo *) malloc(sizeof(Nodo));
     nuevo->valor = v;
     nuevo->sig   = NULL;
 
     if (*p == NULL)
     {
-        // Lista vacía: el nuevo nodo es el primero
         *p = nuevo;
     }
     else
     {
-        // Recorremos hasta el último nodo
         Nodo *aux = *p;
         while (aux->sig != NULL)
             aux = aux->sig;
-        // Enlazamos el nuevo nodo al final
         aux->sig = nuevo;
     }
 }
@@ -173,7 +160,6 @@ Nodo* insertarOrdenado(Nodo **p, int v)
     Nodo *aux = *p;
     Nodo *ant = NULL;
 
-    // Buscamos la posición correcta
     while ((aux != NULL) && (aux->valor <= v))
     {
         ant = aux;
@@ -181,22 +167,17 @@ Nodo* insertarOrdenado(Nodo **p, int v)
     }
 
     if (ant == NULL)
-        *p = nuevo;       // Insertar al inicio
+        *p = nuevo;       
     else
-        ant->sig = nuevo; // Insertar en medio o al final
+        ant->sig = nuevo; 
 
     nuevo->sig = aux;
     return nuevo;
 }
 
-// =============================================
-// FUNCIONES DE LA PRÁCTICA
-// =============================================
-
-// 1. COPIAR lista en otra lista ORDENADA
+// 1. Copiar lista en otra lista de forma ordenada
 void copiarOrdenada(Nodo *origen, Nodo **destino)
 {
-    // Liberar destino si tenía datos
     liberar(destino);
 
     Nodo *aux = origen;
@@ -207,7 +188,7 @@ void copiarOrdenada(Nodo *origen, Nodo **destino)
     }
 }
 
-// 2. INVERTIR la lista (crea una nueva lista invertida)
+// 2. Invertir la lista
 void invertir(Nodo *origen, Nodo **invertida)
 {
     liberar(invertida);
@@ -215,7 +196,6 @@ void invertir(Nodo *origen, Nodo **invertida)
     Nodo *aux = origen;
     while (aux != NULL)
     {
-        // Insertar al INICIO para invertir el orden
         Nodo *nuevo = (Nodo *) malloc(sizeof(Nodo));
         nuevo->valor = aux->valor;
         nuevo->sig   = *invertida;
@@ -225,7 +205,7 @@ void invertir(Nodo *origen, Nodo **invertida)
     }
 }
 
-// 3. ELIMINAR duplicados (modifica la lista original)
+// 3. Eliminar duplicados (modifica la lista original)
 void eliminarDuplicados(Nodo **p)
 {
     Nodo *actual = *p;
@@ -234,12 +214,10 @@ void eliminarDuplicados(Nodo **p)
     {
         Nodo *aux = actual;
 
-        // Buscar y eliminar todos los duplicados del valor actual
         while (aux->sig != NULL)
         {
             if (aux->sig->valor == actual->valor)
             {
-                // Encontramos un duplicado: lo saltamos y liberamos
                 Nodo *dup = aux->sig;
                 aux->sig  = dup->sig;
                 free(dup);
@@ -252,10 +230,6 @@ void eliminarDuplicados(Nodo **p)
         actual = actual->sig;
     }
 }
-
-// =============================================
-// ESTADÍSTICAS 
-// =============================================
 
 int contarNodos(Nodo *p)
 {
@@ -275,19 +249,16 @@ double calcularMedia(Nodo *p, int n)
 
 double calcularMediana(Nodo *ordenada, int n)
 {
-    // La lista ordenada ya viene ordenada
     Nodo *aux = ordenada;
     int medio = n / 2;
 
     if (n % 2 == 1)
     {
-        // Impar: el elemento del medio
         for (int i = 0; i < medio; i++) aux = aux->sig;
         return (double) aux->valor;
     }
     else
     {
-        // Par: promedio de los dos del medio
         for (int i = 0; i < medio - 1; i++) aux = aux->sig;
         double v1 = aux->valor;
         double v2 = aux->sig->valor;
@@ -303,7 +274,6 @@ int calcularModa(Nodo *p)
     Nodo *aux = p;
     while (aux != NULL)
     {
-        // Contar frecuencia del valor actual
         int freq = 0;
         Nodo *aux2 = p;
         while (aux2 != NULL)
@@ -334,10 +304,6 @@ double calcularVarianza(Nodo *p, int n, double media)
     return suma / n;
 }
 
-// =============================================
-// MENÚS
-// =============================================
-
 void menuMostrarEstadisticas(Nodo *lista, Nodo *ordenada)
 {
     mostrarEncabezado("ESTADÍSTICAS DE LA LISTA");
@@ -367,9 +333,9 @@ void menuMostrarEstadisticas(Nodo *lista, Nodo *ordenada)
 
 void menuPrincipal()
 {
-    Nodo *lista    = NULL;  // Lista original (ingresada por el usuario)
-    Nodo *ordenada = NULL;  // Copia ordenada
-    Nodo *invertida = NULL; // Lista invertida
+    Nodo *lista    = NULL;  
+    Nodo *ordenada = NULL;  
+    Nodo *invertida = NULL; 
 
     int op = 0;
 
@@ -398,7 +364,6 @@ void menuPrincipal()
         {
             mostrarEncabezado("INGRESAR VALORES");
 
-            // Liberar lista anterior
             liberar(&lista);
             liberar(&ordenada);
             liberar(&invertida);
@@ -489,7 +454,6 @@ void menuPrincipal()
 
             eliminarDuplicados(&lista);
 
-            // Actualizar listas derivadas
             copiarOrdenada(lista, &ordenada);
             invertir(lista, &invertida);
 
@@ -504,7 +468,6 @@ void menuPrincipal()
         case 6:
         {
             if (lista == NULL) { mostrarAdvertencia("La lista está vacía."); pausar(); break; }
-            // Aseguramos que la lista ordenada exista para la mediana
             if (ordenada == NULL) copiarOrdenada(lista, &ordenada);
             menuMostrarEstadisticas(lista, ordenada);
             break;
