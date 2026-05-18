@@ -46,7 +46,6 @@ void pausar() {
 }
 
 void mostrarEncabezado(const char *titulo) {
-    limpiarPantalla();
     int ancho = 60;
     int len = (int)strlen(titulo);
     int pad = (ancho - len - 2) / 2;
@@ -80,7 +79,6 @@ void mostrarAdvertencia(const char *msg) {
     printf("\n  %s%s⚠  %s%s\n", BOLD, YELLOW, msg, RESET);
 }
 
-// Agrega un nodo al final de la lista
 void agregar(Nodo **p, int v)
 {
     Nodo *nuevo = (Nodo *) malloc(sizeof(Nodo));
@@ -100,7 +98,36 @@ void agregar(Nodo **p, int v)
     }
 }
 
-// Muestra todos los nodos de la lista
+void ingresarValores(Nodo **lista)
+{
+    char linea[1024];
+
+    printf("  %sIngrese números separados por espacios o comas.%s\n", BOLD, RESET);
+    printf("  %sEscriba 0 para terminar.%s\n\n", DIM, RESET);
+
+    while (1)
+    {
+        printf("  > ");
+
+        limpiarBuffer();
+        fgets(linea, sizeof(linea), stdin);
+
+        char *token = strtok(linea, ", \n\t");
+
+        while (token != NULL)
+        {
+            int v = atoi(token);
+
+            if (v == 0)
+                return;
+
+            agregar(lista, v);
+
+            token = strtok(NULL, ", \n\t");
+        }
+    }
+}
+
 void mostrar(Nodo *p)
 {
     if (p == NULL)
@@ -130,7 +157,6 @@ void mostrar(Nodo *p)
     printf("  %s╚══════════════╝%s\n", CYAN, RESET);
 }
 
-// Libera toda la memoria de la lista
 void liberar(Nodo **p)
 {
     while (*p != NULL)
@@ -141,7 +167,6 @@ void liberar(Nodo **p)
     }
 }
 
-// Busca un valor, regresa puntero al nodo o NULL
 Nodo* buscar(Nodo *p, int v)
 {
     Nodo *aux = p;
@@ -150,7 +175,6 @@ Nodo* buscar(Nodo *p, int v)
     return aux;
 }
 
-// Inserta un valor en orden ascendente
 Nodo* insertarOrdenado(Nodo **p, int v)
 {
     Nodo *nuevo = (Nodo *) malloc(sizeof(Nodo));
@@ -175,7 +199,6 @@ Nodo* insertarOrdenado(Nodo **p, int v)
     return nuevo;
 }
 
-// 1. Copiar lista en otra lista de forma ordenada
 void copiarOrdenada(Nodo *origen, Nodo **destino)
 {
     liberar(destino);
@@ -188,7 +211,6 @@ void copiarOrdenada(Nodo *origen, Nodo **destino)
     }
 }
 
-// 2. Invertir la lista
 void invertir(Nodo *origen, Nodo **invertida)
 {
     liberar(invertida);
@@ -205,29 +227,32 @@ void invertir(Nodo *origen, Nodo **invertida)
     }
 }
 
-// 3. Eliminar duplicados (modifica la lista original)
-void eliminarDuplicados(Nodo **p)
+void copiarSinDuplicados(Nodo *original, Nodo **copia)
 {
-    Nodo *actual = *p;
+    liberar(copia);
 
-    while (actual != NULL)
+    Nodo *aux = original;
+
+    while (aux != NULL)
     {
-        Nodo *aux = actual;
+        Nodo *buscarNodo = *copia;
+        int existe = 0;
 
-        while (aux->sig != NULL)
+        while (buscarNodo != NULL)
         {
-            if (aux->sig->valor == actual->valor)
+            if (buscarNodo->valor == aux->valor)
             {
-                Nodo *dup = aux->sig;
-                aux->sig  = dup->sig;
-                free(dup);
+                existe = 1;
+                break;
             }
-            else
-            {
-                aux = aux->sig;
-            }
+
+            buscarNodo = buscarNodo->sig;
         }
-        actual = actual->sig;
+
+        if (!existe)
+            agregar(copia, aux->valor);
+
+        aux = aux->sig;
     }
 }
 
@@ -336,10 +361,11 @@ void menuPrincipal()
     Nodo *lista    = NULL;  
     Nodo *ordenada = NULL;  
     Nodo *invertida = NULL; 
+    Nodo *sinDuplicados = NULL;
 
     int op = 0;
 
-    while (op != 6)
+    while (op != 7)
     {
         mostrarEncabezado("LISTAS DINÁMICAS SIMPLEMENTE ENLAZADAS");
         printf("  %sPráctica 7 - Algoritmos y Estructuras de Datos%s\n\n", DIM, RESET);
@@ -368,22 +394,12 @@ void menuPrincipal()
             liberar(&ordenada);
             liberar(&invertida);
 
-            printf("  %sIngrese enteros (0 para terminar):%s\n\n", BOLD, RESET);
-
-            int v;
-            int count = 0;
-            do {
-                printf("    %sValor #%d:%s ", DIM, count + 1, RESET);
-                scanf("%d", &v);
-                if (v != 0)
-                {
-                    agregar(&lista, v);
-                    count++;
-                }
-            } while (v != 0);
+            ingresarValores(&lista);
 
             mostrarExito("Lista creada exitosamente.");
-            printf("  %s→ Nodos ingresados: %s%d%s\n", DIM, RESET, count, RESET);
+            printf("  %s→ Nodos ingresados: %s%d%s\n",
+                DIM, RESET, contarNodos(lista), RESET);
+
             pausar();
             break;
         }
@@ -447,20 +463,22 @@ void menuPrincipal()
         {
             mostrarEncabezado("ELIMINAR DUPLICADOS");
 
-            if (lista == NULL) { mostrarAdvertencia("La lista está vacía."); pausar(); break; }
+            if (lista == NULL)
+            {
+                mostrarAdvertencia("La lista está vacía.");
+                pausar();
+                break;
+            }
 
-            printf("  %sAntes:%s\n", BOLD, RESET);
+            copiarSinDuplicados(lista, &sinDuplicados);
+
+            printf("  %sLista original:%s\n", BOLD, RESET);
             mostrar(lista);
 
-            eliminarDuplicados(&lista);
+            printf("\n  %sCopia sin duplicados:%s\n", BOLD, RESET);
+            mostrar(sinDuplicados);
 
-            copiarOrdenada(lista, &ordenada);
-            invertir(lista, &invertida);
-
-            printf("\n  %sDespués (sin duplicados):%s\n", BOLD, RESET);
-            mostrar(lista);
-
-            mostrarExito("Duplicados eliminados exitosamente.");
+            mostrarExito("Copia sin duplicados creada.");
             pausar();
             break;
         }
@@ -478,6 +496,7 @@ void menuPrincipal()
             liberar(&lista);
             liberar(&ordenada);
             liberar(&invertida);
+            liberar(&sinDuplicados);
 
             printf("\n%s", GREEN);
             printf("  ╔══════════════════════════════════════════════════╗\n");
