@@ -22,9 +22,6 @@
 #define MAGENTA "\033[35m"
 #define WHITE   "\033[37m"
 
-/* ============================================================
-   NODOS
-   ============================================================ */
 typedef struct NodoChar
 {
     char valor;
@@ -37,9 +34,6 @@ typedef struct NodoDouble
     struct NodoDouble *sig;
 } NodoDouble;
 
-/* ============================================================
-   UTILIDADES DE INTERFAZ
-   ============================================================ */
 void limpiarPantalla()
 {
 #ifdef _WIN32
@@ -64,9 +58,7 @@ void mostrarAdvertencia(const char *msg)
     printf("  %s%s⚠  %s%s\n", BOLD, YELLOW, msg, RESET);
 }
 
-/* ============================================================
-   PILA DE CHARS
-   ============================================================ */
+
 void pushChar(NodoChar **p, char v)
 {
     NodoChar *nuevo = (NodoChar *) malloc(sizeof(NodoChar));
@@ -104,7 +96,6 @@ void liberarChar(NodoChar **p)
     }
 }
 
-/* Imprime el contenido de la pila de chars (tope → fondo) */
 void imprimirPilaChar(NodoChar *p)
 {
     if (p == NULL)
@@ -123,9 +114,7 @@ void imprimirPilaChar(NodoChar *p)
     printf("%s]%s", CYAN, RESET);
 }
 
-/* ============================================================
-   PILA DE DOUBLES
-   ============================================================ */
+
 void pushDouble(NodoDouble **p, double v)
 {
     NodoDouble *nuevo = (NodoDouble *) malloc(sizeof(NodoDouble));
@@ -165,7 +154,6 @@ void liberarDouble(NodoDouble **p)
     }
 }
 
-/* Imprime el contenido de la pila de doubles (tope → fondo) */
 void imprimirPilaDouble(NodoDouble *p)
 {
     if (p == NULL)
@@ -184,9 +172,7 @@ void imprimirPilaDouble(NodoDouble *p)
     printf("%s]%s", CYAN, RESET);
 }
 
-/* ============================================================
-   UTILIDADES DE OPERADORES
-   ============================================================ */
+
 int precedencia(char op)
 {
     switch (op)
@@ -224,9 +210,7 @@ int sonPareja(char apertura, char cierre)
            (apertura == '{' && cierre == '}');
 }
 
-/* ============================================================
-   BALANCEO DE PARÉNTESIS  (con traza paso a paso)
-   ============================================================ */
+
 int balancearParentesis(const char *expr)
 {
     NodoChar *pila = NULL;
@@ -239,7 +223,6 @@ int balancearParentesis(const char *expr)
     {
         char c = expr[i];
 
-        /* Solo mostramos pasos cuando el símbolo es relevante */
         if (esAperturaParentesis(c) || esCierreParentesis(c))
         {
             paso++;
@@ -298,9 +281,6 @@ int balancearParentesis(const char *expr)
     return resultado;
 }
 
-/* ============================================================
-   CONVERSIÓN INFIJA → POSTFIJA  (con traza paso a paso)
-   ============================================================ */
 void infijaAPostfija(const char *expr, char *postfija)
 {
     NodoChar *pila = NULL;
@@ -318,7 +298,6 @@ void infijaAPostfija(const char *expr, char *postfija)
 
         paso++;
 
-        /* Número (posiblemente multidigito) */
         if (isdigit(c))
         {
             char numStr[32];
@@ -332,14 +311,12 @@ void infijaAPostfija(const char *expr, char *postfija)
                 postfija[j++] = numStr[m];
             postfija[j++] = ' ';
 
-            /* imprimir fila */
             postfija[j] = '\0';
             printf("  %-6d  %s%-12s%s  %s%-28s%s  ",
                    paso, GREEN, numStr, RESET, YELLOW, postfija, RESET);
             imprimirPilaChar(pila);
             printf("\n");
         }
-        /* Paréntesis de apertura */
         else if (esAperturaParentesis(c))
         {
             pushChar(&pila, c);
@@ -350,7 +327,6 @@ void infijaAPostfija(const char *expr, char *postfija)
             imprimirPilaChar(pila);
             printf("\n");
         }
-        /* Paréntesis de cierre */
         else if (esCierreParentesis(c))
         {
             while (!pilaCharVacia(pila) && !esAperturaParentesis(topeChar(pila)))
@@ -359,7 +335,7 @@ void infijaAPostfija(const char *expr, char *postfija)
                 postfija[j++] = ' ';
             }
             if (!pilaCharVacia(pila))
-                popChar(&pila);   /* descartar apertura */
+                popChar(&pila);   
 
             postfija[j] = '\0';
             printf("  %-6d  %s%-12c%s  %s%-28s%s  ",
@@ -367,7 +343,6 @@ void infijaAPostfija(const char *expr, char *postfija)
             imprimirPilaChar(pila);
             printf("\n");
         }
-        /* Operador */
         else if (esOperador(c))
         {
             while (!pilaCharVacia(pila) &&
@@ -387,7 +362,6 @@ void infijaAPostfija(const char *expr, char *postfija)
         }
     }
 
-    /* Vaciar pila */
     while (!pilaCharVacia(pila))
     {
         paso++;
@@ -409,9 +383,6 @@ void infijaAPostfija(const char *expr, char *postfija)
     printf("  %sResultado:%s %s%s%s\n", BOLD, RESET, GREEN, postfija, RESET);
 }
 
-/* ============================================================
-   EVALUACIÓN RPN  (con traza paso a paso)
-   ============================================================ */
 double evaluarRPN(const char *postfija, int *errorFlag)
 {
     NodoDouble *pila = NULL;
@@ -440,7 +411,7 @@ double evaluarRPN(const char *postfija, int *errorFlag)
                 char *endptr;
                 double val = strtod(token, &endptr);
 
-                if (endptr != token)   /* es número */
+                if (endptr != token)   
                 {
                     pushDouble(&pila, val);
 
@@ -534,9 +505,7 @@ double evaluarRPN(const char *postfija, int *errorFlag)
     return resultado;
 }
 
-/* ============================================================
-   MAIN
-   ============================================================ */
+
 int main()
 {
 #ifdef _WIN32
@@ -561,7 +530,6 @@ int main()
         return 1;
     }
 
-    /* ── 1. BALANCEO ─────────────────────────────────────────── */
     printf("\n  %s%s[1] BALANCEO DE PARENTESIS%s\n", BOLD, BLUE, RESET);
     printf("  %sExpresion:%s %s%s%s\n", DIM, RESET, CYAN, infija, RESET);
 
@@ -573,20 +541,17 @@ int main()
         return 1;
     }
 
-    /* ── 2. CONVERSIÓN INFIJA → POSTFIJA ────────────────────── */
     printf("\n  %s%s[2] CONVERSION INFIJA a POSTFIJA%s\n", BOLD, BLUE, RESET);
     printf("  %sExpresion infija:%s %s%s%s\n\n", DIM, RESET, CYAN, infija, RESET);
 
     infijaAPostfija(infija, postfija);
 
-    /* ── 3. EVALUACIÓN RPN ───────────────────────────────────── */
     printf("\n  %s%s[3] EVALUACION RPN%s\n", BOLD, BLUE, RESET);
     printf("  %sExpresion postfija:%s %s%s%s\n\n", DIM, RESET, YELLOW, postfija, RESET);
 
     int    errorFlag = 0;
     double resultado = evaluarRPN(postfija, &errorFlag);
 
-    /* ── RESUMEN FINAL ───────────────────────────────────────── */
     printf("\n  %sInfija  :%s  %s%s%s\n", BOLD, RESET, CYAN,   infija,   RESET);
     printf("  %sPostfija:%s  %s%s%s\n", BOLD, RESET, YELLOW, postfija, RESET);
 

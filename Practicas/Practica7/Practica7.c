@@ -46,6 +46,7 @@ void pausar() {
 }
 
 void mostrarEncabezado(const char *titulo) {
+    limpiarPantalla();
     int ancho = 60;
     int len = (int)strlen(titulo);
     int pad = (ancho - len - 2) / 2;
