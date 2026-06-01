@@ -19,19 +19,13 @@
 #define CYAN    "\033[36m"
 #define MAGENTA "\033[35m"
 
-/* ============================================================
-   NODO — lista enlazada circular (implementación de la Cola)
-   p apunta al ÚLTIMO nodo; p->sig apunta al PRIMERO (frente)
-   ============================================================ */
 typedef struct Nodo
 {
     int          valor;
     struct Nodo *sig;
 } Nodo;
 
-/* ============================================================
-   UTILIDADES DE INTERFAZ
-   ============================================================ */
+
 void limpiarPantalla()
 {
 #ifdef _WIN32
@@ -46,9 +40,7 @@ void mostrarError(const char *msg)
     printf("  %s%s✘  %s%s\n", BOLD, RED, msg, RESET);
 }
 
-/* ============================================================
-   COLA — operaciones (lista circular dinámica)
-   ============================================================ */
+
 void encolar(Nodo **p, int v)
 {
     Nodo *nuevo = malloc(sizeof(Nodo));
@@ -103,10 +95,7 @@ void imprimirCola(Nodo *p)
     printf("%s]%s", CYAN, RESET);
 }
 
-/* ============================================================
-   PILA DE CHARS — almacena dígitos del resultado en orden
-   inverso; al desapilar quedan de mayor a menor significancia
-   ============================================================ */
+
 typedef struct NodoChar
 {
     char             valor;
@@ -133,10 +122,7 @@ char popChar(NodoChar **p)
 
 int pilaCharVacia(NodoChar *p) { return p == NULL; }
 
-/* ============================================================
-   CARGAR DÍGITOS EN COLA
-   De derecha a izquierda → frente = dígito menos significativo
-   ============================================================ */
+
 void cargarEnCola(Nodo **cola, const char *numStr)
 {
     int len = (int)strlen(numStr);
@@ -144,55 +130,31 @@ void cargarEnCola(Nodo **cola, const char *numStr)
         encolar(cola, numStr[i] - '0');
 }
 
-/* ============================================================
-   SUMA DE ENTEROS LARGOS
-   Estructuras usadas:
-     colaA, colaB     → dígitos de entrada (frente = unidades)
-     colaAcarreos     → acarreo que SALE de cada columna;
-                        el acarreo de col N entra en col N+1
-     pilaResultado    → dígitos finales en orden inverso
-   Proceso en UNA sola pasada:
-     - Se desencola digA y digB
-     - Se desencola el acarreo que llegó desde la columna anterior
-       (colaAcarreos), se usa y se encola el nuevo acarreo
-       para la siguiente columna
-     - El dígito final se apila en pilaResultado
-   ============================================================ */
 void sumarEnterosLargos(const char *strA, const char *strB)
 {
     int lenA   = (int)strlen(strA);
     int lenB   = (int)strlen(strB);
     int maxLen = lenA > lenB ? lenA : lenB;
 
-    /* ── 1. Cargar dígitos en colas ──────────────────────────── */
     Nodo *colaA = NULL, *colaB = NULL;
     cargarEnCola(&colaA, strA);
     cargarEnCola(&colaB, strB);
 
     printf("\n  %s%s[1] COLAS%s\n\n", BOLD, BLUE, RESET);
+
     printf("  %sCola A%s (frente = unidades): ", BOLD, RESET);
     imprimirCola(colaA); printf("\n");
+
     printf("  %sCola B%s (frente = unidades): ", BOLD, RESET);
     imprimirCola(colaB); printf("\n");
 
-    /* ── 2. Suma columna a columna ───────────────────────────────
-       colaAcarreos arranca vacía (acarreo inicial = 0).
-       En cada columna:
-         acEntrada = acarreo que llegó de la columna anterior
-         suma      = digA + digB + acEntrada
-         digitoFinal = suma % 10   → se apila
-         acSalida    = suma / 10   → se encola para la col siguiente  */
     Nodo     *colaAcarreos  = NULL;
     NodoChar *pilaResultado = NULL;
 
-    /* Encolar un 0 inicial para que la primera columna tenga
-       su acarreo de entrada disponible en la cola */
     encolar(&colaAcarreos, 0);
 
     printf("\n  %s%s[2] SUMA COLUMNA A COLUMNA%s\n\n", BOLD, BLUE, RESET);
-    printf("  %s%-6s  %-8s  %-8s  %-12s  %-8s  %s%s\n",
-           DIM, "Col", "Dig A", "Dig B",
-           "Ac. entrada", "Digito", "Ac. salida", RESET);
+    printf("  %s%-6s  %-8s  %-8s  %-12s  %-8s  %s%s\n", DIM, "Col", "Dig A", "Dig B", "Ac. entrada", "Digito", "Ac. salida", RESET);
 
     int col = 1;
 
@@ -200,16 +162,14 @@ void sumarEnterosLargos(const char *strA, const char *strB)
     {
         int digA      = colaVacia(colaA) ? 0 : desencolar(&colaA);
         int digB      = colaVacia(colaB) ? 0 : desencolar(&colaB);
-        int acEntrada = desencolar(&colaAcarreos);   /* acarreo que llega */
+        int acEntrada = desencolar(&colaAcarreos);   
 
         int suma        = digA + digB + acEntrada;
         int digitoFinal = suma % 10;
         int acSalida    = suma / 10;
 
-        /* guardar acarreo de salida para la siguiente columna */
         encolar(&colaAcarreos, acSalida);
 
-        /* guardar dígito final en pila (orden inverso) */
         pushChar(&pilaResultado, '0' + digitoFinal);
 
         printf("  %-6d  %s%-8d%s  %s%-8d%s  %s%-12d%s  %s%-8d%s  %s%d%s\n",
@@ -221,7 +181,6 @@ void sumarEnterosLargos(const char *strA, const char *strB)
                RED,     acSalida,    RESET);
     }
 
-    /* Si queda acarreo final, es un dígito extra del resultado */
     int acFinal = desencolar(&colaAcarreos);
     if (acFinal)
     {
@@ -235,7 +194,6 @@ void sumarEnterosLargos(const char *strA, const char *strB)
                RED,     0,       RESET);
     }
 
-    /* ── 3. Construir string resultado desapilando ───────────── */
     int   resultadoSize = maxLen + 3;
     char *resultado     = malloc(resultadoSize);
     if (!resultado) { mostrarError("Sin memoria."); exit(1); }
@@ -248,7 +206,6 @@ void sumarEnterosLargos(const char *strA, const char *strB)
     int lenRes = (int)strlen(resultado);
     int ancho  = lenRes > maxLen ? lenRes : maxLen;
 
-    /* ── 4. Resumen visual ───────────────────────────────────── */
     printf("\n  %s%s[3] RESULTADO FINAL%s\n\n", BOLD, GREEN, RESET);
     printf("  %s  %*s%s\n", CYAN,  ancho, strA,      RESET);
     printf("  %s+ %*s%s\n", CYAN,  ancho, strB,      RESET);
@@ -263,9 +220,7 @@ void sumarEnterosLargos(const char *strA, const char *strB)
     liberarCola(&colaAcarreos);
 }
 
-/* ============================================================
-   VALIDACIONES
-   ============================================================ */
+
 int esNumeroValido(const char *s)
 {
     if (!s || !*s) return 0;
@@ -280,9 +235,7 @@ const char *quitarCerosIzquierda(const char *s)
     return s;
 }
 
-/* ============================================================
-   MAIN
-   ============================================================ */
+
 int main()
 {
 #ifdef _WIN32
@@ -292,17 +245,14 @@ int main()
     char bufA[512], bufB[512];
 
     limpiarPantalla();
-    printf("\n  %s%sPRÁCTICA 9 - COLAS: SUMA DE ENTEROS LARGOS%s\n",
-           BOLD, CYAN, RESET);
+    printf("\n  %s%sPRÁCTICA 9 - COLAS: SUMA DE ENTEROS LARGOS%s\n", BOLD, CYAN, RESET);
     printf("  %sAlgoritmos y Estructuras de Datos%s\n\n", DIM, RESET);
 
     printf("  %s> Primer numero:%s  ", BOLD, RESET);
-    if (scanf("%511s", bufA) != 1 || !esNumeroValido(bufA))
-    { mostrarError("Solo digitos positivos."); return 1; }
+    if (scanf("%511s", bufA) != 1 || !esNumeroValido(bufA)) { mostrarError("Solo digitos positivos."); return 1; }
 
     printf("  %s> Segundo numero:%s ", BOLD, RESET);
-    if (scanf("%511s", bufB) != 1 || !esNumeroValido(bufB))
-    { mostrarError("Solo digitos positivos."); return 1; }
+    if (scanf("%511s", bufB) != 1 || !esNumeroValido(bufB)) { mostrarError("Solo digitos positivos."); return 1; }
 
     const char *numA = quitarCerosIzquierda(bufA);
     const char *numB = quitarCerosIzquierda(bufB);
