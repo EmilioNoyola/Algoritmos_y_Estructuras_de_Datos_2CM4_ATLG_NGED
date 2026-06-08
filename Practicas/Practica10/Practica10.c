@@ -1,18 +1,9 @@
 /*
     Práctica 10: Colas de prioridad
-    Estudiantes:
+    Alumnos:
      - Álvarez Tahuilán Luis Gustavo
      - Noyola Gómez Emilio Damian
-    Date: 08 de junio de 2026
-
-    Zero-based array notation:
-        PARENT(i) = (i - 1) / 2     LEFT(i) = 2i + 1     RIGHT(i) = 2i + 2
-    The heap array is handled with base index 0, so all positions are valid from
-    0 to heapSize - 1.
-
-    The program draws the heap as a binary tree in the console, shows each
-    HEAPIFY / sift-up / sift-down step, and supports both max-priority and
-    min-priority queues.
+    Fecha: 08 de junio de 2026
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,22 +23,17 @@
 #define CYAN    "\033[36m"
 #define WHITE   "\033[37m"
 
-#define HL_A "\033[1;32m"   /* target node / destination position  (green) */
-#define HL_B "\033[1;31m"   /* extreme node / exchange position     (red)   */
-#define INFO  "\033[1;36m"   /* informational action text            (cyan)  */
+#define HL_A "\033[1;32m"  
+#define HL_B "\033[1;31m"  
+#define INFO  "\033[1;36m"   
 
-/* ---------------------------------------------------------------- */
-/* Global priority queue state                                      */
-/* ---------------------------------------------------------------- */
-int *heapArray      = NULL;   /* array 0..capacity - 1                */
-int  heapSize       = 0;      /* number of elements in the queue      */
-int  capacity       = 0;      /* maximum size                         */
-int  initialSize    = 0;      /* initial number of elements           */
-int  isMaxHeap      = 1;      /* 1 = max priority, 0 = min priority   */
+int *heapArray      = NULL;   
+int  heapSize       = 0;      
+int  capacity       = 0;  
+int  initialSize    = 0;      
+int  isMaxHeap      = 1;      
 
-/* ---------------------------------------------------------------- */
-/* Interface utilities                                              */
-/* ---------------------------------------------------------------- */
+
 void clearScreen()
 {
 #ifdef _WIN32
@@ -66,8 +52,8 @@ void clearInputBuffer()
 void pauseProgram()
 {
     printf("\n  %s%sPresione ENTER para continuar...%s", DIM, CYAN, RESET);
-    clearInputBuffer();   /* consumes the pending '\n' left by scanf */
-    getchar();            /* waits for the user to press ENTER       */
+    clearInputBuffer();   
+    getchar();       
 }
 
 void showHeader(const char *title)
@@ -81,8 +67,9 @@ void showHeader(const char *title)
     printf("  ╔");
     for (int i = 0; i < width - 2; i++) printf("═");
     printf("╗\n");
-    printf("  ║%s%s%*s%s%*s%s ║\n",
-            BOLD, BLUE, padding + length, title, CYAN, width - 2 - padding - length, "", CYAN);
+
+    printf("  ║%s%s%*s%s%*s%s ║\n", BOLD, BLUE, padding + length, title, CYAN, width - 2 - padding - length, "", CYAN);
+
     printf("  ╚");
     for (int i = 0; i < width - 2; i++) printf("═");
     printf("╝%s\n", RESET);
@@ -101,26 +88,22 @@ void printRule(int length)
 
 void printHeapifyHeader()
 {
-    printf("  %s%-6s %-5s %-7s %-7s %-7s %-10s %-14s%s\n",
-           DIM, "Paso", "i", "A[i]", "izq", "der", "extremo", "Acción", RESET);
+    printf("  %s%-6s %-5s %-7s %-7s %-7s %-10s %-14s%s\n", DIM, "Paso", "i", "A[i]", "izq", "der", "extremo", "Acción", RESET);
     printRule(66);
 }
 
 void printSiftUpHeader()
 {
-    printf("  %s%-6s %-5s %-8s %-9s %-10s %-14s%s\n",
-           DIM, "Paso", "i", "A[i]", "padre", "A[padre]", "Acción", RESET);
+    printf("  %s%-6s %-5s %-8s %-9s %-10s %-14s%s\n", DIM, "Paso", "i", "A[i]", "padre", "A[padre]", "Acción", RESET);
     printRule(64);
 }
 
-/* ---------------------------------------------------------------- */
-/* Heap index functions                                             */
-/* ---------------------------------------------------------------- */
+
 int parentIndex(int index)     { return (index - 1) / 2; }
 int leftChildIndex(int index)  { return 2 * index + 1; }
 int rightChildIndex(int index) { return 2 * index + 2; }
 
-/* For max-heap, "higher priority" means greater; for min-heap, smaller. */
+
 int hasHigherPriority(int firstValue, int secondValue)
 {
     return isMaxHeap ? (firstValue > secondValue) : (firstValue < secondValue);
@@ -137,25 +120,21 @@ int nodeDepth(int index)
     return depth;
 }
 
-/* ---------------------------------------------------------------- */
-/* Array view (Optimized for wrapping long arrays)                 */
-/* ---------------------------------------------------------------- */
 void printArray(int highlightA, int highlightB)
 {
     if (heapSize == 0) { printf("  %s[ cola vacía ]%s\n", DIM, RESET); return; }
 
-    int maxPerLine = 10; // Número máximo de elementos que quieres por fila
+    int maxPerLine = 10;
 
     for (int base = 0; base < heapSize; base += maxPerLine)
     {
         int limit = base + maxPerLine;
         if (limit > heapSize) limit = heapSize;
 
-        // 1. Imprimir fila de Índices
         if (base == 0) {
             printf("  %sÍndice:%s ", DIM, RESET);
         } else {
-            printf("          "); // 10 espacios en blanco para emular el ancho de "  Índice: "
+            printf("          "); 
         }
         
         for (int i = base; i < limit; i++) 
@@ -164,11 +143,10 @@ void printArray(int highlightA, int highlightB)
         }
         printf("\n");
 
-        // 2. Imprimir fila de Valores
         if (base == 0) {
             printf("  %sValor :%s ", DIM, RESET);
         } else {
-            printf("          "); // 10 espacios en blanco para emular el ancho de "  Valor : "
+            printf("          "); 
         }
 
         for (int i = base; i < limit; i++)
@@ -180,7 +158,6 @@ void printArray(int highlightA, int highlightB)
         }
         printf("\n");
 
-        // Espacio extra de separación si quedan más bloques por delante
         if (limit < heapSize)
         {
             printf("\n");
@@ -188,10 +165,7 @@ void printArray(int highlightA, int highlightB)
     }
 }
 
-/* ---------------------------------------------------------------- */
-/* TREE DRAWING                                                     */
-/* Extended canvas capacity to perfectly map up to 50 items         */
-/* ---------------------------------------------------------------- */
+
 #define NW 4
 #define TH 60
 #define TW 500
@@ -211,7 +185,6 @@ void putString(int row, int column, const char *text)
     cell[row][column][15] = '\0';
 }
 
-/* Places a centered numeric label at column c, with optional color. */
 void putLabel(int row, int column, int value, const char *color)
 {
     char buffer[16];
@@ -229,7 +202,6 @@ void putLabel(int row, int column, int value, const char *color)
     }
 }
 
-/* Horizontal position of a node, using the maximum tree depth. */
 int centerX(int index, int maxDepth)
 {
     int depth = nodeDepth(index);
@@ -243,7 +215,6 @@ int centerX(int index, int maxDepth)
     return (startColumn + endColumn) / 2;
 }
 
-/* Top-down view: optimized to scale and trace horizontal charts up to 50 nodes. */
 void drawTreeTopDown(int highlightA, int highlightB)
 {
     int maxDepth = nodeDepth(heapSize - 1);
@@ -295,16 +266,13 @@ void drawTreeTopDown(int highlightA, int highlightB)
     }
 }
 
-/* Always print horizontally, regardless of depth or sizes */
 void drawTree(int highlightA, int highlightB)
 {
     if (heapSize == 0) { printf("  %s(árbol vacío)%s\n", DIM, RESET); return; }
     drawTreeTopDown(highlightA, highlightB);
 }
 
-/* ---------------------------------------------------------------- */
-/* MAX/MIN-HEAPIFY                                                  */
-/* ---------------------------------------------------------------- */
+
 void heapify(int index, int showSteps, int *step)
 {
     int leftIndex = leftChildIndex(index);
@@ -320,9 +288,7 @@ void heapify(int index, int showSteps, int *step)
         if (leftIndex < heapSize) sprintf(leftValue, "%d", heapArray[leftIndex]); else strcpy(leftValue, "-");
         if (rightIndex < heapSize) sprintf(rightValue, "%d", heapArray[rightIndex]); else strcpy(rightValue, "-");
         (*step)++;
-        printf("  %-6d %-5d %s%-7d%s %-7s %-7s %sidx %-6d%s %s%-14s%s\n\n",
-                *step, index, YELLOW, heapArray[index], RESET, leftValue, rightValue,
-                MAGENTA, bestIndex, RESET,
+        printf("  %-6d %-5d %s%-7d%s %-7s %-7s %sidx %-6d%s %s%-14s%s\n\n", *step, index, YELLOW, heapArray[index], RESET, leftValue, rightValue, MAGENTA, bestIndex, RESET,
                 (bestIndex != index) ? GREEN : INFO,
                 (bestIndex != index) ? "intercambia" : "en posición", RESET);
     }
@@ -337,15 +303,11 @@ void heapify(int index, int showSteps, int *step)
     }
 }
 
-/* ---------------------------------------------------------------- */
-/* BUILD-MAX/MIN-HEAP                                               */
-/* ---------------------------------------------------------------- */
 void buildHeap(int showSteps)
 {
     heapSize = initialSize;
 
-    printf("\n  %s%s[2] CONSTRUCCIÓN DEL MONTÍCULO  (BUILD-%s-HEAP)%s\n\n",
-            BOLD, BLUE, isMaxHeap ? "MAX" : "MIN", RESET);
+    printf("\n  %s%s[2] CONSTRUCCIÓN DEL MONTÍCULO  (BUILD-%s-HEAP)%s\n\n", BOLD, BLUE, isMaxHeap ? "MAX" : "MIN", RESET);
     printf("  %sArreglo inicial:%s\n", BOLD, RESET);
     printArray(-1, -1);
 
@@ -372,9 +334,6 @@ void buildHeap(int showSteps)
     drawTree(-1, -1);
 }
 
-/* ---------------------------------------------------------------- */
-/* HEAP-PEEK (Consultar elemento de mayor prioridad sin extraer)   */
-/* ---------------------------------------------------------------- */
 void peek()
 {
     if (heapSize < 1)
@@ -382,14 +341,10 @@ void peek()
         showError("La cola está vacía. No hay elementos que consultar.");
         return;
     }
-    printf("\n  %sElemento en la cima (raíz):%s %s%d%s\n", 
-           BOLD, RESET, GREEN, heapArray[0], RESET);
+    printf("\n  %sElemento en la cima (raíz):%s %s%d%s\n", BOLD, RESET, GREEN, heapArray[0], RESET);
     printf("  %sPrioridad:%s %s\n", BOLD, RESET, isMaxHeap ? "MÁXIMA (Mayor valor)" : "MÍNIMA (Menor valor)");
 }
 
-/* ---------------------------------------------------------------- */
-/* HEAP-EXTRACT  (dequeue: removes and returns the root)            */
-/* ---------------------------------------------------------------- */
 int dequeue(int showSteps)
 {
     if (heapSize < 1)
@@ -402,10 +357,8 @@ int dequeue(int showSteps)
 
     if (showSteps)
     {
-        printf("\n  %sElemento de %s prioridad (raíz) = %s%d%s\n",
-               BOLD, isMaxHeap ? "MÁXIMA" : "MÍNIMA", GREEN, root, RESET);
-        printf("  %sSe coloca el último elemento A[%d]=%d en la raíz y se reduce el tamaño.%s\n\n",
-               DIM, heapSize - 1, heapArray[heapSize - 1], RESET);
+        printf("\n  %sElemento de %s prioridad (raíz) = %s%d%s\n", BOLD, isMaxHeap ? "MÁXIMA" : "MÍNIMA", GREEN, root, RESET);
+        printf("  %sSe coloca el último elemento A[%d]=%d en la raíz y se reduce el tamaño.%s\n\n", DIM, heapSize - 1, heapArray[heapSize - 1], RESET);
     }
 
     heapArray[0] = heapArray[heapSize - 1];
@@ -414,8 +367,7 @@ int dequeue(int showSteps)
     if (showSteps && heapSize > 0)
     {
         printArray(0, -1);
-        printf("\n  %s→ %s-HEAPIFY(A, 0) para restaurar la propiedad de montículo:%s\n",
-               CYAN, isMaxHeap ? "MAX" : "MIN", RESET);
+        printf("\n  %s→ %s-HEAPIFY(A, 0) para restaurar la propiedad de montículo:%s\n", CYAN, isMaxHeap ? "MAX" : "MIN", RESET);
         printHeapifyHeader();
         int step = 0;
         heapify(0, 1, &step);
@@ -433,9 +385,6 @@ int dequeue(int showSteps)
     return root;
 }
 
-/* ---------------------------------------------------------------- */
-/* HEAP-INSERT  (enqueue: adds a value and moves it up)             */
-/* ---------------------------------------------------------------- */
 void enqueue(int key, int showSteps)
 {
     if (heapSize >= capacity)
@@ -450,11 +399,9 @@ void enqueue(int key, int showSteps)
 
     if (showSteps)
     {
-        printf("\n  %sSe agrega %s%d%s como nueva hoja en la posición %d.%s\n",
-               BOLD, GREEN, key, RESET, insertedIndex, RESET);
+        printf("\n  %sSe agrega %s%d%s como nueva hoja en la posición %d.%s\n", BOLD, GREEN, key, RESET, insertedIndex, RESET);
         printArray(insertedIndex, -1);
-        printf("\n  %s→ Sift-up: se compara con el padre y sube mientras tenga mayor prioridad.%s\n",
-               CYAN, RESET);
+        printf("\n  %s→ Sift-up: se compara con el padre y sube mientras tenga mayor prioridad.%s\n", CYAN, RESET);
         printSiftUpHeader();
     }
 
@@ -466,9 +413,7 @@ void enqueue(int key, int showSteps)
         if (showSteps)
         {
             step++;
-            printf("  %-6d %-5d %s%-8d%s %-9d %s%-10d%s %s%-14s%s\n",
-                   step, index, YELLOW, heapArray[index], RESET, parent,
-                   YELLOW, heapArray[parent], RESET, GREEN, "intercambia", RESET);
+            printf("  %-6d %-5d %s%-8d%s %-9d %s%-10d%s %s%-14s%s\n", step, index, YELLOW, heapArray[index], RESET, parent, YELLOW, heapArray[parent], RESET, GREEN, "intercambia", RESET);
         }
         int temporary = heapArray[index];
         heapArray[index] = heapArray[parent];
@@ -487,15 +432,11 @@ void enqueue(int key, int showSteps)
     }
 }
 
-/* ---------------------------------------------------------------- */
-/* Dequeue all elements                                             */
-/* ---------------------------------------------------------------- */
 void dequeueAll()
 {
     if (heapSize < 1) { showWarning("La cola ya está vacía."); return; }
 
-    printf("\n  %sOrden de salida (de %s a %s prioridad):%s\n\n  ",
-            BOLD, isMaxHeap ? "MAYOR" : "MENOR", isMaxHeap ? "menor" : "mayor", RESET);
+    printf("\n  %sOrden de salida (de %s a %s prioridad):%s\n\n  ", BOLD, isMaxHeap ? "MAYOR" : "MENOR", isMaxHeap ? "menor" : "mayor", RESET);
 
     int isFirst = 1;
     while (heapSize > 0)
@@ -509,9 +450,7 @@ void dequeueAll()
     printf("  %sNota: extraer la raíz repetidamente equivale a HEAPSORT.%s\n", DIM, RESET);
 }
 
-/* ---------------------------------------------------------------- */
-/* EXTRA: HEAPSORT demonstration over a copy                        */
-/* ---------------------------------------------------------------- */
+
 void heapifyArray(int *array, int size, int index)
 {
     int leftIndex = 2 * index + 1;
@@ -566,8 +505,7 @@ void HeapSort()
         printf("\n");
     }
 
-    printf("\n  %sArreglo ordenado (%s):%s  ",
-            BOLD, isMaxHeap ? "ascendente" : "descendente", RESET);
+    printf("\n  %sArreglo ordenado (%s):%s  ", BOLD, isMaxHeap ? "ascendente" : "descendente", RESET);
     for (int i = 0; i < elementCount; i++) printf("%s%d%s ", GREEN, copyArray[i], RESET);
     printf("\n");
     showSuccess("HEAPSORT completado sobre una copia (la cola no se modificó).");
@@ -575,9 +513,7 @@ void HeapSort()
     free(copyArray);
 }
 
-/* ---------------------------------------------------------------- */
-/* Safe integer reading                                             */
-/* ---------------------------------------------------------------- */
+
 int readInteger(int *destination)
 {
     int value;
@@ -586,9 +522,6 @@ int readInteger(int *destination)
     return 1;
 }
 
-/* ---------------------------------------------------------------- */
-/* Initial configuration                                            */
-/* ---------------------------------------------------------------- */
 void configure()
 {
     showHeader("COLAS DE PRIORIDAD");
@@ -614,7 +547,7 @@ void configure()
         if (!readInteger(&initialSize)) initialSize = 0;
     } while (initialSize < 1 || initialSize > 50);
 
-    capacity = initialSize + 16;            /* leaves extra room for enqueue */
+    capacity = initialSize + 16;            
     if (capacity < 16) capacity = 16;
 
     heapArray = malloc(capacity * sizeof(int));
@@ -631,18 +564,13 @@ void configure()
     pauseProgram();
 }
 
-/* ---------------------------------------------------------------- */
-/* Main menu                                                        */
-/* ---------------------------------------------------------------- */
 void menu()
 {
     int option = 0;
     while (option != 6)
     {
         showHeader("MENÚ - COLA DE PRIORIDAD");
-        printf("  %sTipo:%s %s%s%s   %sElementos:%s %s%d%s / %d\n\n",
-               BOLD, RESET, CYAN, isMaxHeap ? "MÁXIMA prioridad" : "MÍNIMA prioridad", RESET,
-               BOLD, RESET, GREEN, heapSize, RESET, capacity);
+        printf("  %sTipo:%s %s%s%s   %sElementos:%s %s%d%s / %d\n\n", BOLD, RESET, CYAN, isMaxHeap ? "MÁXIMA prioridad" : "MÍNIMA prioridad", RESET, BOLD, RESET, GREEN, heapSize, RESET, capacity);
 
         printf("    %s[1]%s  Encolar (insertar un elemento)\n", CYAN, RESET);
         printf("    %s[2]%s  Desencolar (extraer la raíz)\n", CYAN, RESET);
@@ -685,8 +613,7 @@ void menu()
             printRule(60);
             printf("\n  %s[2] ARREGLO EQUIVALENTE (VISTA DE COLA):%s\n", BOLD, RESET);
             printArray(-1, -1);
-            printf("  %sTotal de elementos actuales:%s %s%d%s  (capacidad %d)\n",
-                   BOLD, RESET, GREEN, heapSize, RESET, capacity);
+            printf("  %sTotal de elementos actuales:%s %s%d%s  (capacidad %d)\n", BOLD, RESET, GREEN, heapSize, RESET, capacity);
             
             printRule(60);
             printf("\n  %s[3] VISTA EN ÁRBOL (ESTRUCTURA):%s\n\n", BOLD, RESET);
