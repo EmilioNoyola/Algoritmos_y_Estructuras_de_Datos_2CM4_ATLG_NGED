@@ -3,7 +3,7 @@
     Alumnos:
      - Álvarez Tahuilán Luis Gustavo
      - Noyola Gómez Emilio Damian
-    Fecha: 11 de junio de 2026
+    Fecha: 15 de junio de 2026
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,10 +76,11 @@ void mostrarEncabezado(const char *titulo)
     printf("\n%s", CYAN);
     printf("  ╔");
     for (int i = 0; i < ancho - 2; i++) printf("═");
+
     printf("╗\n");
-    printf("  ║%s%s%*s%s%*s%s ║\n",
-           BOLD, BLUE, pad + len, titulo, CYAN, ancho - 2 - pad - len, "", CYAN);
+    printf("  ║%s%s%*s%s%*s%s ║\n", BOLD, BLUE, pad + len, titulo, CYAN, ancho - 2 - pad - len, "", CYAN);
     printf("  ╚");
+
     for (int i = 0; i < ancho - 2; i++) printf("═");
     printf("╝%s\n", RESET);
 }
@@ -140,19 +141,18 @@ void normalizar(const char *s, char *dest)
             char r = 0;
             switch (d)
             {
-                case 0xA1: case 0x81: r = 'a'; break; /* á Á */
-                case 0xA9: case 0x89: r = 'e'; break; /* é É */
-                case 0xAD: case 0x8D: r = 'i'; break; /* í Í */
-                case 0xB3: case 0x93: r = 'o'; break; /* ó Ó */
-                case 0xBA: case 0x9A: r = 'u'; break; /* ú Ú */
-                case 0xBC: case 0x9C: r = 'u'; break; /* ü Ü */
-                case 0xB1: case 0x91: r = 'n'; break; /* ñ Ñ */
+                case 0xA1: case 0x81: r = 'a'; break; 
+                case 0xA9: case 0x89: r = 'e'; break; 
+                case 0xAD: case 0x8D: r = 'i'; break; 
+                case 0xB3: case 0x93: r = 'o'; break; 
+                case 0xBA: case 0x9A: r = 'u'; break; 
+                case 0xBC: case 0x9C: r = 'u'; break; 
+                case 0xB1: case 0x91: r = 'n'; break; 
                 default:   r = (char) d;     break;
             }
             dest[j++] = r;
-            i++;                                 /* consume el segundo byte */
+            i++;                               
         }
-        /* otros bytes multibyte raros se ignoran */
     }
     dest[j] = '\0';
 }
@@ -199,7 +199,6 @@ int posicionDe(Nodo *p, Nodo *objetivo)
 #define SEP 6
 void dibujarCajas(const char *labels[], const char *apes[], int n)
 {
-    /* etiquetas */
     printf("   ");
     for (int i = 0; i < n; i++)
     {
@@ -207,7 +206,7 @@ void dibujarCajas(const char *labels[], const char *apes[], int n)
         if (i < n - 1) printf("%*s", SEP, "");
     }
     printf("\n");
-    /* borde superior */
+
     printf("   ");
     for (int i = 0; i < n; i++)
     {
@@ -215,7 +214,7 @@ void dibujarCajas(const char *labels[], const char *apes[], int n)
         if (i < n - 1) printf("%*s", SEP, "");
     }
     printf("\n");
-    /* contenido + flechas dobles (la flecha mide exactamente SEP columnas) */
+
     printf("   ");
     for (int i = 0; i < n; i++)
     {
@@ -223,7 +222,7 @@ void dibujarCajas(const char *labels[], const char *apes[], int n)
         if (i < n - 1) printf(" %s◀──▶%s ", MAGENTA, RESET);
     }
     printf("\n");
-    /* borde inferior */
+
     printf("   ");
     for (int i = 0; i < n; i++)
     {
@@ -233,21 +232,17 @@ void dibujarCajas(const char *labels[], const char *apes[], int n)
     printf("\n");
 }
 
-/* ---------------------------------------------------------------- */
-/*  INSERCIÓN ORDENADA por apellidos                                */
-/* ---------------------------------------------------------------- */
+
 Nodo *insertarOrdenado(Nodo **p, Nodo **q, Alumno a, int animar)
 {
     Nodo *nuevo = crearNodo(a);
 
-    /* Lista vacía: p y q apuntan al nuevo nodo */
     if (*p == NULL)
     {
         *p = *q = nuevo;
         if (animar)
         {
-            printf("\n  %sLa lista estaba vacía: %sp%s y %sq%s apuntan al nuevo nodo.%s\n",
-                   DIM, BOLD, DIM, BOLD, DIM, RESET);
+            printf("\n  %sLa lista estaba vacía: %sp%s y %sq%s apuntan al nuevo nodo.%s\n", DIM, BOLD, DIM, BOLD, DIM, RESET);
             const char *l[] = { "p, q → nuevo" };
             const char *ap[] = { a.apellidos };
             dibujarCajas(l, ap, 1);
@@ -261,8 +256,7 @@ Nodo *insertarOrdenado(Nodo **p, Nodo **q, Alumno a, int animar)
 
     if (animar)
     {
-        printf("\n  %sInsertando: %s%s%s  (%s)%s\n\n", BOLD, CYAN,
-               a.apellidos, RESET, a.nombre, RESET);
+        printf("\n  %sInsertando: %s%s%s  (%s)%s\n\n", BOLD, CYAN, a.apellidos, RESET, a.nombre, RESET);
         printf("  %s", DIM);
         imprimirPad("Paso", 6);
         imprimirPad("aux (apellido)", 18);
@@ -297,7 +291,7 @@ Nodo *insertarOrdenado(Nodo **p, Nodo **q, Alumno a, int animar)
         printf("%sse detiene%s\n", RED, RESET);
     }
 
-    if (anterior == NULL)                 /* insertar al INICIO */
+    if (anterior == NULL)                 
     {
         nuevo->sig = aux;
         aux->ant   = nuevo;
@@ -312,7 +306,7 @@ Nodo *insertarOrdenado(Nodo **p, Nodo **q, Alumno a, int animar)
             printf("    %s(nuevo->ant = NULL)%s\n", DIM, RESET);
         }
     }
-    else if (aux == NULL)                 /* insertar al FINAL */
+    else if (aux == NULL)                 
     {
         anterior->sig = nuevo;
         nuevo->ant    = anterior;
@@ -327,7 +321,7 @@ Nodo *insertarOrdenado(Nodo **p, Nodo **q, Alumno a, int animar)
             printf("    %s(nuevo->sig = NULL)%s\n", DIM, RESET);
         }
     }
-    else                                  /* insertar EN MEDIO */
+    else                                 
     {
         anterior->sig = nuevo;
         nuevo->ant    = anterior;
@@ -346,17 +340,13 @@ Nodo *insertarOrdenado(Nodo **p, Nodo **q, Alumno a, int animar)
     return nuevo;
 }
 
-/* ---------------------------------------------------------------- */
-/*  BÚSQUEDA BIDIRECCIONAL por boleta (meet-in-the-middle)           */
-/* ---------------------------------------------------------------- */
 Nodo *buscarBidireccional(Nodo *p, Nodo *q, const char *boleta, int animar)
 {
     Nodo *ini = p, *fin = q;
 
     if (animar)
     {
-        printf("\n  %s%sBúsqueda bidireccional%s  (desde p →  y  ← desde q a la vez)\n\n",
-               BOLD, BLUE, RESET);
+        printf("\n  %s%sBúsqueda bidireccional%s  (desde p →  y  ← desde q a la vez)\n\n", BOLD, BLUE, RESET);
         printf("  %s%-5s  %-22s  %-22s%s\n", DIM, "Paso", "desde inicio (p→)", "desde final (←q)", RESET);
     }
 
@@ -364,13 +354,10 @@ Nodo *buscarBidireccional(Nodo *p, Nodo *q, const char *boleta, int animar)
     while (ini != NULL && fin != NULL)
     {
         paso++;
-        if (animar)
-            printf("  %-5d  %s%-22s%s  %s%-22s%s\n",
-                   paso, GREEN, ini->info.boleta, RESET, CYAN, fin->info.boleta, RESET);
-
+        if (animar) printf("  %-5d  %s%-22s%s  %s%-22s%s\n", paso, GREEN, ini->info.boleta, RESET, CYAN, fin->info.boleta, RESET);
         if (strcmp(ini->info.boleta, boleta) == 0) return ini;
         if (strcmp(fin->info.boleta, boleta) == 0) return fin;
-        if (ini == fin || ini->sig == fin) break;   /* se cruzaron */
+        if (ini == fin || ini->sig == fin) break;
 
         ini = ini->sig;
         fin = fin->ant;
@@ -378,32 +365,29 @@ Nodo *buscarBidireccional(Nodo *p, Nodo *q, const char *boleta, int animar)
     return NULL;
 }
 
-/* ---------------------------------------------------------------- */
-/*  ELIMINAR por boleta (4 casos: único, primero, último, medio)     */
-/* ---------------------------------------------------------------- */
 int eliminarPorBoleta(Nodo **p, Nodo **q, const char *boleta)
 {
     Nodo *aux = *p;
     while (aux != NULL && strcmp(aux->info.boleta, boleta) != 0)
         aux = aux->sig;
 
-    if (aux == NULL) return 0;            /* no encontrado */
+    if (aux == NULL) return 0;            
 
-    if (aux->ant == NULL && aux->sig == NULL)   /* único nodo */
+    if (aux->ant == NULL && aux->sig == NULL)   
     {
         *p = *q = NULL;
     }
-    else if (aux->ant == NULL)                  /* primero */
+    else if (aux->ant == NULL)              
     {
         *p = aux->sig;
         (*p)->ant = NULL;
     }
-    else if (aux->sig == NULL)                  /* último */
+    else if (aux->sig == NULL)                  
     {
         *q = aux->ant;
         (*q)->sig = NULL;
     }
-    else                                        /* en medio */
+    else                                    
     {
         aux->ant->sig = aux->sig;
         aux->sig->ant = aux->ant;
@@ -437,8 +421,7 @@ void dibujarCadena(Nodo *p, Nodo *q)
 
     const char *ep = p->info.apellidos[0] ? p->info.apellidos : p->info.boleta;
     const char *eq = q->info.apellidos[0] ? q->info.apellidos : q->info.boleta;
-    printf("\n  %s⇄ = doble enlace (ant/sig).   p → %s%s%s,   q → %s%s%s\n",
-           DIM, GREEN, ep, DIM, GREEN, eq, RESET);
+    printf("\n  %s⇄ = doble enlace (ant/sig).   p → %s%s%s,   q → %s%s%s\n", DIM, GREEN, ep, DIM, GREEN, eq, RESET);
 }
 
 void lineaTabla(const char *izq, const char *med, const char *der)
@@ -457,7 +440,7 @@ void filaTabla(int num, const Alumno *a)
 {
     char ns[8];
     snprintf(ns, sizeof(ns), "%d", num);
-    printf("  %s║%s ", CYAN, RESET);          imprimirPad(ns, 2);
+    printf("  %s║%s ", CYAN, RESET);           imprimirPad(ns, 2);
     printf(" %s│%s ", CYAN, RESET);            imprimirPad(a->boleta, 12);
     printf(" %s│%s ", CYAN, RESET);            imprimirPad(a->nombre, 16);
     printf(" %s│%s ", CYAN, RESET);            imprimirPad(a->apellidos, 16);
@@ -495,9 +478,7 @@ void mostrarDescendente(Nodo *q)
     lineaTabla("╚", "╧", "╝");
 }
 
-/* ---------------------------------------------------------------- */
-/*  Archivo: cargar y guardar                                        */
-/* ---------------------------------------------------------------- */
+
 void recortar(char *s)
 {
     int n = (int) strlen(s);
@@ -517,9 +498,15 @@ int existeBoleta(Nodo *p, const char *boleta)
     return 0;
 }
 
-/* Parser robusto: detecta boleta, nombre y apellidos aunque los campos
-   estén separados por TABULADORES o por ESPACIOS, y aunque el nombre y los
-   apellidos vengan juntos en un solo campo. Devuelve 1 si obtuvo datos. */
+int boletaValida(const char *s)
+{
+    if (!s || !*s) return 0;
+    for (int i = 0; s[i]; i++)
+        if (s[i] < '0' || s[i] > '9') return 0;
+    return 1;
+}
+
+
 int parsearLinea(const char *original, Alumno *a)
 {
     char linea[256];
@@ -531,22 +518,20 @@ int parsearLinea(const char *original, Alumno *a)
     memset(a, 0, sizeof(*a));
     if (linea[0] == '\0') return 0;
 
-    /* boleta = primer token (hasta el primer espacio o tabulador) */
     int i = 0;
     while (linea[i] && linea[i] != ' ' && linea[i] != '\t') i++;
     int len = i < (int) sizeof(a->boleta) - 1 ? i : (int) sizeof(a->boleta) - 1;
     strncpy(a->boleta, linea, len);
     a->boleta[len] = '\0';
 
-    /* resto = lo que sigue a la boleta */
     char resto[200];
     strncpy(resto, linea + i, sizeof(resto) - 1);
     resto[sizeof(resto) - 1] = '\0';
     recortar(resto);
-    if (resto[0] == '\0') return 1;       /* solo había boleta */
+    if (resto[0] == '\0') return 1;       
 
     char *tab = strchr(resto, '\t');
-    if (tab)                              /* nombre y apellidos separados por TAB */
+    if (tab)                              
     {
         *tab = '\0';
         char *ape = tab + 1;
@@ -555,7 +540,7 @@ int parsearLinea(const char *original, Alumno *a)
         strncpy(a->nombre,    resto, sizeof(a->nombre) - 1);
         strncpy(a->apellidos, ape,   sizeof(a->apellidos) - 1);
     }
-    else                                  /* vienen juntos: 1er palabra = nombre */
+    else                               
     {
         char *sp = strchr(resto, ' ');
         if (sp)
@@ -566,7 +551,7 @@ int parsearLinea(const char *original, Alumno *a)
             strncpy(a->nombre,    resto, sizeof(a->nombre) - 1);
             strncpy(a->apellidos, ape,   sizeof(a->apellidos) - 1);
         }
-        else                              /* una sola palabra: se usa como apellido */
+        else                              
         {
             strncpy(a->apellidos, resto, sizeof(a->apellidos) - 1);
         }
@@ -587,7 +572,7 @@ int cargarArchivo(Nodo **p, Nodo **q, const char *nombre)
         Alumno a;
         if (!parsearLinea(linea, &a)) continue;
         if (a.boleta[0] == '\0')             continue;
-        if (existeBoleta(*p, a.boleta))      continue;   /* evita duplicados por boleta */
+        if (existeBoleta(*p, a.boleta))      continue;   
         insertarOrdenado(p, q, a, 0);
         agregados++;
     }
@@ -605,20 +590,7 @@ int guardarArchivo(Nodo *p, const char *nombre)
     return 1;
 }
 
-/* ---------------------------------------------------------------- */
-/*  Lectura/validación de datos de un alumno                         */
-/* ---------------------------------------------------------------- */
-int boletaValida(const char *s)
-{
-    if (!s || !*s) return 0;
-    for (int i = 0; s[i]; i++)
-        if (s[i] < '0' || s[i] > '9') return 0;
-    return 1;
-}
 
-/* ---------------------------------------------------------------- */
-/*  Opciones del menú                                                */
-/* ---------------------------------------------------------------- */
 void altaAlumno(Nodo **p, Nodo **q)
 {
     mostrarEncabezado("ALTA DE ALUMNO");
@@ -644,7 +616,7 @@ void altaAlumno(Nodo **p, Nodo **q)
     if (strlen(a.nombre) == 0 || strlen(a.apellidos) == 0)
     { mostrarError("Nombre y apellidos no pueden estar vacíos."); pausar(); return; }
 
-    insertarOrdenado(p, q, a, 1);        /* con animación */
+    insertarOrdenado(p, q, a, 1);        
 
     printf("\n  %sLista actualizada (ordenada por apellidos):%s\n", BOLD, RESET);
     dibujarCadena(*p, *q);
@@ -663,8 +635,7 @@ void leerArchivo(Nodo **p, Nodo **q)
 
     if (*p != NULL)
     {
-        printf("\n  %sEsto reemplazará la lista actual. ¿Continuar? (s/n) %s[s]%s: ",
-               BOLD, DIM, RESET);
+        printf("\n  %sEsto reemplazará la lista actual. ¿Continuar? (s/n) %s[s]%s: ", BOLD, DIM, RESET);
         char r[16]; leerLinea(r, sizeof(r));
         if (r[0] == 'n' || r[0] == 'N') { mostrarAdvertencia("Operación cancelada."); pausar(); return; }
         liberarLista(p, q);
@@ -673,8 +644,7 @@ void leerArchivo(Nodo **p, Nodo **q)
     int n = cargarArchivo(p, q, nombre);
     if (n < 0) { mostrarError("No se pudo abrir el archivo."); pausar(); return; }
 
-    printf("\n  %sSe leyeron %s%d%s registros desde %s%s%s.%s\n",
-           BOLD, GREEN, n, RESET, CYAN, nombre, RESET, RESET);
+    printf("\n  %sSe leyeron %s%d%s registros desde %s%s%s.%s\n", BOLD, GREEN, n, RESET, CYAN, nombre, RESET, RESET);
     printf("\n  %sLista (ordenada por apellidos):%s\n", BOLD, RESET);
     dibujarCadena(*p, *q);
     mostrarExito("Archivo leído correctamente.");
@@ -728,7 +698,6 @@ void modificarAlumno(Nodo **p, Nodo **q)
     filaTabla(posicionDe(*p, nodo), &nodo->info);
     lineaTabla("╚", "╧", "╝");
 
-    /* Construimos los nuevos datos (ENTER = conservar el valor actual) */
     Alumno nuevo = nodo->info;
     char buf[40];
 
@@ -745,22 +714,19 @@ void modificarAlumno(Nodo **p, Nodo **q)
 
     if (!cambiaOrden)
     {
-        nodo->info = nuevo;              /* mismo lugar: actualización directa */
+        nodo->info = nuevo;              
         mostrarExito("Datos actualizados. El alumno conserva su posición.");
         pausar();
         return;
     }
 
-    /* El campo de ordenamiento cambió: reubicar para conservar el orden */
-    printf("\n  %s%sVerificando posición...%s el apellido cambió, se reubica el alumno.\n",
-           BOLD, YELLOW, RESET);
+    printf("\n  %s%sVerificando posición...%s el apellido cambió, se reubica el alumno.\n", BOLD, YELLOW, RESET);
 
     eliminarPorBoleta(p, q, nodo->info.boleta);
     Nodo *reins = insertarOrdenado(p, q, nuevo, 0);
     int posDespues = posicionDe(*p, reins);
 
-    printf("\n  %sReubicado de la posición %s%d%s a la posición %s%d%s.%s\n",
-           BOLD, YELLOW, posAntes, RESET, GREEN, posDespues, RESET, RESET);
+    printf("\n  %sReubicado de la posición %s%d%s a la posición %s%d%s.%s\n", BOLD, YELLOW, posAntes, RESET, GREEN, posDespues, RESET, RESET);
     printf("\n  %sLista actualizada:%s\n", BOLD, RESET);
     dibujarCadena(*p, *q);
     mostrarExito("Modificación aplicada. La lista sigue ordenada por apellidos.");
@@ -779,17 +745,14 @@ void guardar(Nodo *p)
 
     if (guardarArchivo(p, nombre))
     {
-        printf("\n  %sSe guardaron %s%d%s alumnos en %s%s%s.%s\n",
-               BOLD, GREEN, contar(p), RESET, CYAN, nombre, RESET, RESET);
+        printf("\n  %sSe guardaron %s%d%s alumnos en %s%s%s.%s\n", BOLD, GREEN, contar(p), RESET, CYAN, nombre, RESET, RESET);
         mostrarExito("Lista guardada correctamente.");
     }
     else mostrarError("No se pudo escribir el archivo.");
     pausar();
 }
 
-/* ---------------------------------------------------------------- */
-/*  Menú principal                                                   */
-/* ---------------------------------------------------------------- */
+
 int main()
 {
 #ifdef _WIN32
@@ -798,15 +761,13 @@ int main()
 
     Nodo *p = NULL, *q = NULL;
 
-    /* Inicialmente, leer los registros desde el archivo */
     mostrarEncabezado("SISTEMA DE ALUMNOS - LISTA DOBLEMENTE ENLAZADA");
     printf("  %sPráctica 11 - Algoritmos y Estructuras de Datos%s\n", DIM, RESET);
     int n = cargarArchivo(&p, &q, ARCHIVO_DEFECTO);
     if (n < 0)
         mostrarAdvertencia("No se encontró '" ARCHIVO_DEFECTO "'. Se inicia con la lista vacía.");
     else
-        printf("\n  %sSe cargaron %s%d%s registros iniciales desde %s%s%s.%s\n",
-               BOLD, GREEN, n, RESET, CYAN, ARCHIVO_DEFECTO, RESET, RESET);
+        printf("\n  %sSe cargaron %s%d%s registros iniciales desde %s%s%s.%s\n", BOLD, GREEN, n, RESET, CYAN, ARCHIVO_DEFECTO, RESET, RESET);
     pausar();
 
     int op = 0;
@@ -835,8 +796,7 @@ int main()
             mostrarEncabezado("SALIR");
             if (p != NULL)
             {
-                printf("  %s¿Guardar los cambios en %s%s%s antes de salir? (s/n):%s ",
-                       BOLD, CYAN, ARCHIVO_DEFECTO, BOLD, RESET);
+                printf("  %s¿Guardar los cambios en %s%s%s antes de salir? (s/n):%s ", BOLD, CYAN, ARCHIVO_DEFECTO, BOLD, RESET);
                 char r[16]; leerLinea(r, sizeof(r));
                 if (r[0] == 's' || r[0] == 'S')
                 {
